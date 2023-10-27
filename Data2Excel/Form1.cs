@@ -356,7 +356,7 @@ namespace Data2Excel
             }
             app = new Excel.Application();
             app.Visible = true;
-            Workbook myworkbook = app.Workbooks.Open(filefullname);
+            myworkbook = app.Workbooks.Open(filefullname);
             mysheet = myworkbook.Sheets[1];
             ;
 
@@ -448,7 +448,6 @@ namespace Data2Excel
                     }
                     source_cell.Copy();
                     target_cell.PasteSpecial();
-
                 }
             }
         }
@@ -502,6 +501,80 @@ namespace Data2Excel
         private void textBox_num_col_TextChanged(object sender, EventArgs e)
         {
             num_col_idx = ColumnLetterToNumber(textBox_num_col.Text);
+        }
+
+        private void button_edit_run_Click(object sender, EventArgs e)
+        {
+            int cur_source_row = 1;
+            int cur_target_row = 1;
+            Worksheet mysourcesheet = mysheet;
+            Worksheet mytargetsheet = myworkbook.Sheets.Add();
+            mytargetsheet.Name = "output";
+            int start_rearrange_col = ColumnLetterToNumber(textBox_start_rearrange_clo.Text);
+            int end_rearrange_col = start_rearrange_col;
+            if (textBox_end_rearrange_col.Text.Length > 0)
+            {
+                end_rearrange_col = ColumnLetterToNumber(textBox_end_rearrange_col.Text);
+            }
+            int start_keep_col = ColumnLetterToNumber(textBox_start_keep_col.Text);
+            int end_keep_col = ColumnLetterToNumber(textBox_end_keep_col.Text);
+            
+            
+            while (mysourcesheet.Cells[cur_source_row,start_keep_col].Text.Length > 0)
+            {
+                Range copy_range = mysourcesheet.get_Range($"{textBox_start_keep_col.Text}{cur_source_row}:{textBox_end_keep_col.Text}{cur_source_row}");
+                
+                //copy_range.Copy();
+                if(textBox_end_rearrange_col.Text.Length > 0)
+                {
+                    for (int i = start_rearrange_col; i < end_rearrange_col + 1; i++)
+                    {
+                        Range target_range = mytargetsheet.get_Range($"{textBox_start_keep_col.Text}{cur_target_row}:{textBox_start_keep_col.Text}{cur_target_row}");
+                        copy_range.Copy();
+                        //target_range.PasteSpecial();
+                        mytargetsheet.Paste(target_range);
+                        for (int j = 0; j < int.Parse(textBox_cells.Text); j++)
+                        {
+                            if (i > end_rearrange_col)
+                            {
+                                break;
+                            }
+                            Range source_rerange = mysourcesheet.Cells[cur_source_row, i];
+                            source_rerange.Copy();
+                            Range target_rerange = mytargetsheet.Cells[cur_target_row, start_rearrange_col + j];
+                            mytargetsheet.Paste(target_rerange);
+                            //target_rerange.PasteSpecial(XlPasteType.xlPasteAll);
+                            i++;
+                        }
+                        i--;
+                        cur_target_row++;
+                    }
+                    cur_source_row++;
+                }
+                else
+                {
+                    int i = start_rearrange_col;
+                    while (mysourcesheet.Cells[cur_source_row,i].Text.Length > 0)
+                    {
+                        Range target_range = mytargetsheet.get_Range($"{textBox_start_keep_col.Text}{cur_target_row}:{textBox_start_keep_col.Text}{cur_target_row}");
+                        copy_range.Copy();
+                        //target_range.PasteSpecial();
+                        mytargetsheet.Paste(target_range);
+                        for (int j = 0; j < int.Parse(textBox_cells.Text); j++)
+                        {
+                            Range source_rerange = mysourcesheet.Cells[cur_source_row, i];
+                            source_rerange.Copy();
+                            Range target_rerange = mytargetsheet.Cells[cur_target_row, start_rearrange_col + j];
+                            mytargetsheet.Paste(target_rerange);
+                            //target_rerange.PasteSpecial(XlPasteType.xlPasteAll);
+                            i++;
+                        }
+                        cur_target_row++;
+                    }
+                    cur_source_row++;
+                }
+                
+            }
         }
     }
 }
