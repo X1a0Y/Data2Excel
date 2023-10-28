@@ -13,16 +13,20 @@ using System.Windows.Forms;
 using TextBox = System.Windows.Forms.TextBox;
 using Ookii.Dialogs.WinForms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using OfficeOpenXml;
+using System.Text.RegularExpressions;
 
 namespace Data2Excel
 {
     public partial class Form1 : Form
     {
+        private static readonly object locker = new object();
         //11
         public string watermarkText1 = "Column Width";
         public string watermarkText2 = "Row Height";
         public string watermarkText3 = "Number of cells added per row";
 
+        public int offset_img = 5;
         public double col_width = 0;
         public double row_height = 0;
         public int cell_per_row = 0;
@@ -30,9 +34,12 @@ namespace Data2Excel
         public List<int> lst_need_change_col = new List<int>();
         public List<int> lst_need_change_row = new List<int>();
         public Worksheet mysheet;
+        public Worksheet mysheet_output;
         public Workbook myworkbook;
+        public Workbook myworkbook_output;
         public Excel.Application app;
-
+        public Excel.Application app_output;
+        public Dictionary<int[],string> dic_pic_cell_name = new Dictionary<int[],string>();
         public string folder_path;
         //22
         //Worksheet mysheet;
@@ -46,11 +53,15 @@ namespace Data2Excel
         Dictionary<int, int> copy_col = new Dictionary<int, int>();
         string filename = null;
 
+        //33
+        int input_end_row = 0;
+        int input_end_col = 0;
 
         public Form1()
         {
             InitializeComponent();
             this.ActiveControl = button_select;
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -173,6 +184,9 @@ namespace Data2Excel
 
             //workbook.SaveAs(filePath);
             ProcessFolder(mysheet, folder_path, 1, 1);
+            this.TopMost = true;
+            this.TopMost = false;
+            MessageBox.Show("ok");
         }
 
 
@@ -195,17 +209,34 @@ namespace Data2Excel
             string[] subfolders = Directory.GetDirectories(folderPath);
             string[] files = Directory.GetFiles(folderPath);
 
-            string[] pngFiles = Array.FindAll(files, s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase));
+            //string[] pngFiles = Array.FindAll(files, s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase));
+            string[] imageFiles = Array.FindAll(files, s => s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || s.EndsWith(".png", StringComparison.OrdinalIgnoreCase));
+
+
+
+            Array.Sort(imageFiles);
+
+
+            //Array.Sort(imageFiles, (a, b) =>
+            //{
+            //    int aNumber = int.Parse(Regex.Match(a, @"\d+").Value);
+            //    int bNumber = int.Parse(Regex.Match(b, @"\d+").Value);
+
+            //    return aNumber.CompareTo(bNumber);
+            //});
+
+
+
             int cur_col = startCol + 1;
             int cur_pic_idx = 0;
-            int lenpng = pngFiles.Length;
+            int lenpng = imageFiles.Length;
 
             while (lenpng > 0)
             {
                 int range_each = cell_per_row > 0 ? Math.Min(lenpng, cell_per_row) : lenpng;
                 for (int i = 0; i < range_each; i++)
                 {
-                    string imgName = pngFiles[cur_pic_idx];
+                    string imgName = imageFiles[cur_pic_idx];
                     cur_pic_idx++;
                     AddImage(sheet, imgName, startRow, cur_col + i);
                 }
@@ -243,6 +274,10 @@ namespace Data2Excel
         public void AddImage(Worksheet sheet, string image_path, int start_row, int start_col)
         {
             Image image = Image.FromFile(image_path);
+            float image_width = image.Width / 2;
+            float image_height = image.Height / 2;
+            image.Dispose();
+            dic_pic_cell_name.Add(new int[] {start_row, start_col},Path.GetFileName(image_path));
             if (!lst_need_change_col.Contains(start_col))
             {
                 lst_need_change_col.Add(start_col);
@@ -259,7 +294,9 @@ namespace Data2Excel
 
 
             // 插入图片并将其锚定到单元格
-            var picture = sheet.Shapes.AddPicture(image_path, MsoTriState.msoFalse, MsoTriState.msoCTrue, cellRange.Left, cellRange.Top, image.Width / 2, image.Height / 2);
+            var picture = sheet.Shapes.AddPicture(image_path, MsoTriState.msoFalse, MsoTriState.msoCTrue, cellRange.Left + offset_img, cellRange.Top + offset_img, image_width, image_height);
+            picture.Left = cellRange.Left + offset_img;
+            picture.Top = cellRange.Top + offset_img;
         }
 
 
@@ -327,6 +364,7 @@ namespace Data2Excel
             {
                 mysheet.SaveAs(saveFileDialog.FileName);
 
+                
                 app.Quit();
                 folder_path = null;
             }
@@ -353,6 +391,13 @@ namespace Data2Excel
 
                 //MessageBox.Show("Please Choose File");
                 return;
+            }
+            using (var package = new ExcelPackage(new FileInfo(filefullname)))
+            {
+                var worksheet = package.Workbook.Worksheets[0]; // 或者指定您要处理的工作表
+
+                input_end_row = worksheet.Dimension.End.Row; // 获取最后一行的行号
+                input_end_col = worksheet.Dimension.End.Column; // 获取最后一列的列号
             }
             app = new Excel.Application();
             app.Visible = true;
@@ -505,75 +550,315 @@ namespace Data2Excel
 
         private void button_edit_run_Click(object sender, EventArgs e)
         {
-            int cur_source_row = 1;
+            DateTime start_time = DateTime.Now;
+            //int cur_source_row = 1;
             int cur_target_row = 1;
             Worksheet mysourcesheet = mysheet;
-            Worksheet mytargetsheet = myworkbook.Sheets.Add();
-            mytargetsheet.Name = "output";
+            Worksheet mytargetsheet = null;
+            if (checkBox_new_sheet.Checked)
+            {
+                mytargetsheet = myworkbook.Sheets.Add();
+                mytargetsheet.Name = "output";
+            }
+            else
+            {
+                //app_output = new Excel.Application();
+                //app_output.Visible = true;
+                myworkbook = app.Workbooks.Add();
+                mytargetsheet = myworkbook.Sheets[1];
+                mysheet_output = mytargetsheet;
+            }
+            
             int start_rearrange_col = ColumnLetterToNumber(textBox_start_rearrange_clo.Text);
-            int end_rearrange_col = start_rearrange_col;
+            int end_rearrange_col = input_end_col;
             if (textBox_end_rearrange_col.Text.Length > 0)
             {
                 end_rearrange_col = ColumnLetterToNumber(textBox_end_rearrange_col.Text);
             }
             int start_keep_col = ColumnLetterToNumber(textBox_start_keep_col.Text);
             int end_keep_col = ColumnLetterToNumber(textBox_end_keep_col.Text);
-            
-            
-            while (mysourcesheet.Cells[cur_source_row,start_keep_col].Text.Length > 0)
+
+            progressBar1.Maximum = input_end_row;
+            progressBar1.Value = 0;
+
+            //while (mysourcesheet.Cells[cur_source_row,start_keep_col].Text.Length > 0)
+            //for (int cur_source_row = 1; cur_source_row < input_end_row + 1; cur_source_row++)
+            Parallel.For(1, input_end_row + 1, cur_source_row =>
             {
-                Range copy_range = mysourcesheet.get_Range($"{textBox_start_keep_col.Text}{cur_source_row}:{textBox_end_keep_col.Text}{cur_source_row}");
-                
-                //copy_range.Copy();
-                if(textBox_end_rearrange_col.Text.Length > 0)
+                bool need_copy = false;
+                bool change_row = true;
+                int cur_col = 0;
+                if (mysourcesheet.Cells[cur_source_row, start_keep_col].Text.Length > 0)
                 {
-                    for (int i = start_rearrange_col; i < end_rearrange_col + 1; i++)
-                    {
-                        Range target_range = mytargetsheet.get_Range($"{textBox_start_keep_col.Text}{cur_target_row}:{textBox_start_keep_col.Text}{cur_target_row}");
-                        copy_range.Copy();
-                        //target_range.PasteSpecial();
-                        mytargetsheet.Paste(target_range);
-                        for (int j = 0; j < int.Parse(textBox_cells.Text); j++)
-                        {
-                            if (i > end_rearrange_col)
-                            {
-                                break;
-                            }
-                            Range source_rerange = mysourcesheet.Cells[cur_source_row, i];
-                            source_rerange.Copy();
-                            Range target_rerange = mytargetsheet.Cells[cur_target_row, start_rearrange_col + j];
-                            mytargetsheet.Paste(target_rerange);
-                            //target_rerange.PasteSpecial(XlPasteType.xlPasteAll);
-                            i++;
-                        }
-                        i--;
-                        cur_target_row++;
-                    }
-                    cur_source_row++;
+                    need_copy = true;
                 }
                 else
                 {
-                    int i = start_rearrange_col;
-                    while (mysourcesheet.Cells[cur_source_row,i].Text.Length > 0)
+                    for (int i = 1; i < input_end_row + 1; i++)
                     {
-                        Range target_range = mytargetsheet.get_Range($"{textBox_start_keep_col.Text}{cur_target_row}:{textBox_start_keep_col.Text}{cur_target_row}");
-                        copy_range.Copy();
-                        //target_range.PasteSpecial();
-                        mytargetsheet.Paste(target_range);
-                        for (int j = 0; j < int.Parse(textBox_cells.Text); j++)
+                        if (mysourcesheet.Cells[cur_source_row, i].Text.Length > 0)
                         {
-                            Range source_rerange = mysourcesheet.Cells[cur_source_row, i];
-                            source_rerange.Copy();
-                            Range target_rerange = mytargetsheet.Cells[cur_target_row, start_rearrange_col + j];
-                            mytargetsheet.Paste(target_rerange);
-                            //target_rerange.PasteSpecial(XlPasteType.xlPasteAll);
-                            i++;
+                            need_copy = true;
                         }
-                        cur_target_row++;
                     }
-                    cur_source_row++;
                 }
-                
+                if (need_copy)
+                {
+                    //lock (locker)
+                    //{
+                        Range copy_range = mysourcesheet.get_Range($"{textBox_start_keep_col.Text}{cur_source_row}:{textBox_end_keep_col.Text}{cur_source_row}");
+                    //}
+                    
+                    bool exitLoops = false;
+
+                    //copy_range.Copy();
+                    //if (textBox_end_rearrange_col.Text.Length > 0)
+                    {
+                        for (int i = start_rearrange_col; i < end_rearrange_col + 1; i++)//每一个需要处理的列
+                        {
+                            //lock (locker)
+                            //{
+                                Range target_range = mytargetsheet.get_Range($"{textBox_start_keep_col.Text}{cur_target_row}:{textBox_end_keep_col.Text}{cur_target_row}");
+                            //}
+                            
+                            //copy_range.Copy();
+                            ////target_range.PasteSpecial();
+                            //mytargetsheet.Paste(target_range);
+
+                            for (int j = 0; j < int.Parse(textBox_cells.Text); j++)
+                            {
+
+                                if (i > end_rearrange_col)
+                                {
+                                    break;
+                                }
+
+                                Range source_rerange = mysourcesheet.Cells[cur_source_row, i];
+                                if (mysourcesheet.Cells[cur_source_row, i].Text.Length > 0)
+                                {
+                                    lock (locker)
+                                    {
+                                        source_rerange.Copy();
+                                        Range target_rerange = mytargetsheet.Cells[cur_target_row, start_rearrange_col + cur_col];
+                                        mytargetsheet.Paste(target_rerange);
+                                        target_rerange.RowHeight = source_rerange.RowHeight;
+                                        target_rerange.ColumnWidth = source_rerange.ColumnWidth;
+                                        cur_col++;
+                                        change_row = false;
+                                    }
+                                    
+                                    //target_rerange.PasteSpecial(XlPasteType.xlPasteAll);
+                                }
+                                //else
+                                //{
+
+                                //    //cur_target_row--;
+                                //    //exitLoops = true;
+                                //    //i++;
+                                //    //break;
+                                //}
+                                lock (locker)
+                                {
+                                    i++;
+                                }
+                                
+                                if (cur_col == int.Parse(textBox_cells.Text))
+                                {
+                                    break;
+                                }
+                            }
+                            lock (locker)
+                            {
+                                i--;
+                            }
+
+                            
+                            if (i == start_rearrange_col + int.Parse(textBox_cells.Text) - 1)
+                            {
+                                lock (locker)
+                                {
+                                    copy_range.Copy();
+                                    //target_range.PasteSpecial();
+                                    mytargetsheet.Paste(target_range);
+                                    //change_row = true;
+                                    if (cur_col == int.Parse(textBox_cells.Text))
+                                    {
+                                        //change_row = false;
+                                        cur_target_row++;
+                                        cur_col = 0;
+                                    }
+                                }
+                                
+
+                                continue;
+                            }
+                            //if (exitLoops)
+                            //{
+                            //    //if (i > start_rearrange_col)
+                            //    //{
+                            //    //    target_range.ClearContents();
+                            //    //    cur_target_row--; 
+                            //    //}
+                            //    if (cur_col == int.Parse(textBox_cells.Text))
+                            //    {
+                            //        if (i == input_end_col)
+                            //        {
+                            //            //change_row = false;
+                            //        }
+                            //        cur_target_row++;
+                            //        cur_col = 0;
+                            //    }
+                            //    exitLoops = false;
+                            //    continue;
+                            //}
+                            lock (locker)
+                            {
+                                copy_range.Copy();
+                                //target_range.PasteSpecial();
+                                mytargetsheet.Paste(target_range);
+
+                                if (cur_col == int.Parse(textBox_cells.Text))
+                                {
+                                    if (i == input_end_col)
+                                    {
+                                        //change_row = false;
+                                    }
+                                    cur_target_row++;
+                                    cur_col = 0;
+                                }
+                            }
+                            
+
+
+
+
+                        }
+
+                        //cur_source_row++;
+                    }
+                    //else
+                    //{
+
+                    //    int i = start_rearrange_col;
+                    //    //while (mysourcesheet.Cells[cur_source_row,i].Text.Length > 0 || i == start_rearrange_col)
+                    //    while (mysourcesheet.Cells[cur_source_row, 1].Text.Length > 0)
+                    //    {
+                    //        //if (mysourcesheet.Cells[cur_source_row, i].Text.Length > 0 || i == start_rearrange_col)
+                    //        //{
+
+                    //        //}
+                    //        Range target_range = mytargetsheet.get_Range($"{textBox_start_keep_col.Text}{cur_target_row}:{textBox_start_keep_col.Text}{cur_target_row}");
+                    //        copy_range.Copy();
+                    //        //target_range.PasteSpecial();
+                    //        mytargetsheet.Paste(target_range);
+                    //        for (int j = 0; j < int.Parse(textBox_cells.Text); j++)
+                    //        {
+                    //            Range source_rerange = mysourcesheet.Cells[cur_source_row, i];
+                    //            source_rerange.Copy();
+                    //            Range target_rerange = mytargetsheet.Cells[cur_target_row, start_rearrange_col + j];
+                    //            mytargetsheet.Paste(target_rerange);
+                    //            //target_rerange.PasteSpecial(XlPasteType.xlPasteAll);
+                    //            i++;
+                    //        }
+                    //        cur_target_row++;
+                    //        i = start_rearrange_col;
+                    //    }
+                    //    cur_source_row++;
+                    //}
+                }
+                //if (change_row)
+                {
+                    if (cur_col < int.Parse(textBox_cells.Text) && cur_col != 0 || change_row)
+                    {
+                        if (need_copy)
+                        {
+                            cur_target_row++;
+                        }
+
+                    }
+
+                }
+                progressBar1.Value++;
+
+            });
+            DateTime end_time = DateTime.Now;
+            MessageBox.Show((end_time - start_time).ToString());
+            MessageBox.Show("ok");
+        }
+
+        private void button_edit_save_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save File";
+            saveFileDialog.Filter = "Excel File (*.xlsx)|*.xlsx|所有文件 (*.*)|*.*";
+            saveFileDialog.DefaultExt = "*.xlsx";
+            saveFileDialog.FileName = "mysheet";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                if (checkBox_new_file.Checked)
+                {
+                    mysheet_output.SaveAs(saveFileDialog.FileName);
+                }
+                else
+                {
+                    mysheet.SaveAs(saveFileDialog.FileName);
+                }
+
+                app.Quit();
+                //folder_path = null;
+            }
+        }
+
+        private void button_save_add_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save File";
+            saveFileDialog.Filter = "Excel File (*.xlsx)|*.xlsx|所有文件 (*.*)|*.*";
+            saveFileDialog.DefaultExt = "*.xlsx";
+            saveFileDialog.FileName = "mysheet";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                mysheet.SaveAs(saveFileDialog.FileName);
+
+                app.Quit();
+                //folder_path = null;
+            }
+        }
+
+        private void checkBox_new_sheet_Click(object sender, EventArgs e)
+        {
+            checkBox_new_sheet.Checked = true;
+            checkBox_new_file.Checked = false;
+        }
+
+        private void checkBox_new_file_Click(object sender, EventArgs e)
+        {
+            checkBox_new_file.Checked = true;
+            checkBox_new_sheet.Checked = false;
+        }
+
+        private void button_txt_Click(object sender, EventArgs e)
+        {
+            StringBuilder output_string = new StringBuilder();
+            if(dic_pic_cell_name.Count > 0)
+            {
+                foreach (var item in dic_pic_cell_name.Keys)
+                {
+                    string cell_info = mysheet.Cells[item[0],item[1]].Value;
+                    string file_name = dic_pic_cell_name[item];
+                    output_string.AppendLine(cell_info.Replace("\\","") + "," + file_name);
+                }
+            }
+            File.WriteAllText(folder_path + "\\log.txt", output_string.ToString() );
+            MessageBox.Show("log save as " + folder_path);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (app != null)
+            {
+                app.Quit();
+                filename = null;
             }
         }
     }

@@ -30,6 +30,7 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage_New = new System.Windows.Forms.TabPage();
+            this.button_txt = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.button_save = new System.Windows.Forms.Button();
             this.button_resize = new System.Windows.Forms.Button();
@@ -45,7 +46,7 @@
             this.textBox_num_col = new System.Windows.Forms.TextBox();
             this.textBox_target_cell = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.button_save_add = new System.Windows.Forms.Button();
             this.button_run = new System.Windows.Forms.Button();
             this.textBox_row_count = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -53,6 +54,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.button_select_file = new System.Windows.Forms.Button();
             this.tabPage_Edit = new System.Windows.Forms.TabPage();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.checkBox_new_sheet = new System.Windows.Forms.CheckBox();
+            this.checkBox_new_file = new System.Windows.Forms.CheckBox();
             this.button_edit_save = new System.Windows.Forms.Button();
             this.button_edit_run = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -66,6 +70,7 @@
             this.textBox_end_keep_col = new System.Windows.Forms.TextBox();
             this.textBox_start_keep_col = new System.Windows.Forms.TextBox();
             this.button_select_edit_file = new System.Windows.Forms.Button();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.tabControl1.SuspendLayout();
             this.tabPage_New.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -74,6 +79,7 @@
             this.groupBox1.SuspendLayout();
             this.tabPage_Add.SuspendLayout();
             this.tabPage_Edit.SuspendLayout();
+            this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -86,28 +92,40 @@
             this.tabControl1.Controls.Add(this.tabPage_Edit);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(232, 253);
+            this.tabControl1.Size = new System.Drawing.Size(232, 321);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage_New
             // 
+            this.tabPage_New.Controls.Add(this.button_txt);
             this.tabPage_New.Controls.Add(this.panel1);
             this.tabPage_New.Controls.Add(this.button_select);
             this.tabPage_New.Controls.Add(this.groupBox3);
             this.tabPage_New.Controls.Add(this.groupBox2);
             this.tabPage_New.Controls.Add(this.groupBox1);
             this.tabPage_New.Location = new System.Drawing.Point(4, 22);
-            this.tabPage_New.Margin = new System.Windows.Forms.Padding(2);
+            this.tabPage_New.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage_New.Name = "tabPage_New";
-            this.tabPage_New.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPage_New.Size = new System.Drawing.Size(224, 227);
+            this.tabPage_New.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage_New.Size = new System.Drawing.Size(224, 295);
             this.tabPage_New.TabIndex = 0;
             this.tabPage_New.Text = "New";
             this.tabPage_New.UseVisualStyleBackColor = true;
+            // 
+            // button_txt
+            // 
+            this.button_txt.Location = new System.Drawing.Point(5, 214);
+            this.button_txt.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button_txt.Name = "button_txt";
+            this.button_txt.Size = new System.Drawing.Size(94, 25);
+            this.button_txt.TabIndex = 5;
+            this.button_txt.Text = "Output txt";
+            this.button_txt.UseVisualStyleBackColor = true;
+            this.button_txt.Click += new System.EventHandler(this.button_txt_Click);
             // 
             // panel1
             // 
@@ -116,16 +134,15 @@
             this.panel1.Controls.Add(this.button_save);
             this.panel1.Controls.Add(this.button_resize);
             this.panel1.Location = new System.Drawing.Point(5, 174);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(216, 25);
             this.panel1.TabIndex = 4;
             // 
             // button_save
             // 
-            this.button_save.Dock = System.Windows.Forms.DockStyle.Right;
             this.button_save.Location = new System.Drawing.Point(122, 0);
-            this.button_save.Margin = new System.Windows.Forms.Padding(2);
+            this.button_save.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button_save.Name = "button_save";
             this.button_save.Size = new System.Drawing.Size(94, 25);
             this.button_save.TabIndex = 1;
@@ -137,7 +154,7 @@
             // 
             this.button_resize.Dock = System.Windows.Forms.DockStyle.Left;
             this.button_resize.Location = new System.Drawing.Point(0, 0);
-            this.button_resize.Margin = new System.Windows.Forms.Padding(2);
+            this.button_resize.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button_resize.Name = "button_resize";
             this.button_resize.Size = new System.Drawing.Size(94, 25);
             this.button_resize.TabIndex = 0;
@@ -149,7 +166,7 @@
             // 
             this.button_select.Dock = System.Windows.Forms.DockStyle.Top;
             this.button_select.Location = new System.Drawing.Point(2, 137);
-            this.button_select.Margin = new System.Windows.Forms.Padding(2);
+            this.button_select.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.button_select.Name = "button_select";
             this.button_select.Size = new System.Drawing.Size(220, 25);
             this.button_select.TabIndex = 3;
@@ -162,9 +179,9 @@
             this.groupBox3.Controls.Add(this.textBox_per_row_cell_num);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox3.Location = new System.Drawing.Point(2, 92);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(2);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(2);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupBox3.Size = new System.Drawing.Size(220, 45);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
@@ -173,7 +190,7 @@
             // 
             this.textBox_per_row_cell_num.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox_per_row_cell_num.Location = new System.Drawing.Point(2, 16);
-            this.textBox_per_row_cell_num.Margin = new System.Windows.Forms.Padding(2);
+            this.textBox_per_row_cell_num.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.textBox_per_row_cell_num.Name = "textBox_per_row_cell_num";
             this.textBox_per_row_cell_num.Size = new System.Drawing.Size(216, 21);
             this.textBox_per_row_cell_num.TabIndex = 0;
@@ -186,9 +203,9 @@
             this.groupBox2.Controls.Add(this.textBox_row_height);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox2.Location = new System.Drawing.Point(2, 47);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupBox2.Size = new System.Drawing.Size(220, 45);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
@@ -197,7 +214,7 @@
             // 
             this.textBox_row_height.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox_row_height.Location = new System.Drawing.Point(2, 16);
-            this.textBox_row_height.Margin = new System.Windows.Forms.Padding(2);
+            this.textBox_row_height.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.textBox_row_height.Name = "textBox_row_height";
             this.textBox_row_height.Size = new System.Drawing.Size(216, 21);
             this.textBox_row_height.TabIndex = 0;
@@ -210,9 +227,9 @@
             this.groupBox1.Controls.Add(this.textBox_col_width);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox1.Location = new System.Drawing.Point(2, 2);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.groupBox1.Size = new System.Drawing.Size(220, 45);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
@@ -221,7 +238,7 @@
             // 
             this.textBox_col_width.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox_col_width.Location = new System.Drawing.Point(2, 16);
-            this.textBox_col_width.Margin = new System.Windows.Forms.Padding(2);
+            this.textBox_col_width.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.textBox_col_width.Name = "textBox_col_width";
             this.textBox_col_width.Size = new System.Drawing.Size(216, 21);
             this.textBox_col_width.TabIndex = 0;
@@ -235,7 +252,7 @@
             this.tabPage_Add.Controls.Add(this.textBox_num_col);
             this.tabPage_Add.Controls.Add(this.textBox_target_cell);
             this.tabPage_Add.Controls.Add(this.label3);
-            this.tabPage_Add.Controls.Add(this.button1);
+            this.tabPage_Add.Controls.Add(this.button_save_add);
             this.tabPage_Add.Controls.Add(this.button_run);
             this.tabPage_Add.Controls.Add(this.textBox_row_count);
             this.tabPage_Add.Controls.Add(this.label2);
@@ -243,10 +260,10 @@
             this.tabPage_Add.Controls.Add(this.label1);
             this.tabPage_Add.Controls.Add(this.button_select_file);
             this.tabPage_Add.Location = new System.Drawing.Point(4, 22);
-            this.tabPage_Add.Margin = new System.Windows.Forms.Padding(2);
+            this.tabPage_Add.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage_Add.Name = "tabPage_Add";
-            this.tabPage_Add.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPage_Add.Size = new System.Drawing.Size(224, 227);
+            this.tabPage_Add.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage_Add.Size = new System.Drawing.Size(224, 267);
             this.tabPage_Add.TabIndex = 1;
             this.tabPage_Add.Text = "Add";
             this.tabPage_Add.UseVisualStyleBackColor = true;
@@ -289,15 +306,15 @@
             this.label3.TabIndex = 19;
             this.label3.Text = "Target Column";
             // 
-            // button1
+            // button_save_add
             // 
-            this.button1.Location = new System.Drawing.Point(139, 175);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(71, 23);
-            this.button1.TabIndex = 18;
-            this.button1.Text = "Save";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button_save_Click);
+            this.button_save_add.Location = new System.Drawing.Point(139, 175);
+            this.button_save_add.Name = "button_save_add";
+            this.button_save_add.Size = new System.Drawing.Size(71, 23);
+            this.button_save_add.TabIndex = 18;
+            this.button_save_add.Text = "Save";
+            this.button_save_add.UseVisualStyleBackColor = true;
+            this.button_save_add.Click += new System.EventHandler(this.button_save_add_Click);
             // 
             // button_run
             // 
@@ -359,6 +376,8 @@
             // 
             // tabPage_Edit
             // 
+            this.tabPage_Edit.Controls.Add(this.progressBar1);
+            this.tabPage_Edit.Controls.Add(this.groupBox7);
             this.tabPage_Edit.Controls.Add(this.button_edit_save);
             this.tabPage_Edit.Controls.Add(this.button_edit_run);
             this.tabPage_Edit.Controls.Add(this.groupBox6);
@@ -366,25 +385,65 @@
             this.tabPage_Edit.Controls.Add(this.groupBox4);
             this.tabPage_Edit.Controls.Add(this.button_select_edit_file);
             this.tabPage_Edit.Location = new System.Drawing.Point(4, 22);
-            this.tabPage_Edit.Margin = new System.Windows.Forms.Padding(2);
+            this.tabPage_Edit.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage_Edit.Name = "tabPage_Edit";
-            this.tabPage_Edit.Size = new System.Drawing.Size(224, 227);
+            this.tabPage_Edit.Size = new System.Drawing.Size(224, 295);
             this.tabPage_Edit.TabIndex = 2;
             this.tabPage_Edit.Text = "Edit";
             this.tabPage_Edit.UseVisualStyleBackColor = true;
             // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.checkBox_new_sheet);
+            this.groupBox7.Controls.Add(this.checkBox_new_file);
+            this.groupBox7.Location = new System.Drawing.Point(8, 189);
+            this.groupBox7.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox7.Size = new System.Drawing.Size(200, 42);
+            this.groupBox7.TabIndex = 20;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "OutPut";
+            // 
+            // checkBox_new_sheet
+            // 
+            this.checkBox_new_sheet.AutoSize = true;
+            this.checkBox_new_sheet.Checked = true;
+            this.checkBox_new_sheet.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_new_sheet.Location = new System.Drawing.Point(115, 18);
+            this.checkBox_new_sheet.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBox_new_sheet.Name = "checkBox_new_sheet";
+            this.checkBox_new_sheet.Size = new System.Drawing.Size(78, 16);
+            this.checkBox_new_sheet.TabIndex = 1;
+            this.checkBox_new_sheet.Text = "New Sheet";
+            this.checkBox_new_sheet.UseVisualStyleBackColor = true;
+            this.checkBox_new_sheet.Click += new System.EventHandler(this.checkBox_new_sheet_Click);
+            // 
+            // checkBox_new_file
+            // 
+            this.checkBox_new_file.AutoSize = true;
+            this.checkBox_new_file.Location = new System.Drawing.Point(6, 18);
+            this.checkBox_new_file.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBox_new_file.Name = "checkBox_new_file";
+            this.checkBox_new_file.Size = new System.Drawing.Size(72, 16);
+            this.checkBox_new_file.TabIndex = 0;
+            this.checkBox_new_file.Text = "New File";
+            this.checkBox_new_file.UseVisualStyleBackColor = true;
+            this.checkBox_new_file.Click += new System.EventHandler(this.checkBox_new_file_Click);
+            // 
             // button_edit_save
             // 
-            this.button_edit_save.Location = new System.Drawing.Point(137, 189);
+            this.button_edit_save.Location = new System.Drawing.Point(137, 235);
             this.button_edit_save.Name = "button_edit_save";
             this.button_edit_save.Size = new System.Drawing.Size(71, 23);
             this.button_edit_save.TabIndex = 19;
             this.button_edit_save.Text = "Save";
             this.button_edit_save.UseVisualStyleBackColor = true;
+            this.button_edit_save.Click += new System.EventHandler(this.button_edit_save_Click);
             // 
             // button_edit_run
             // 
-            this.button_edit_run.Location = new System.Drawing.Point(8, 189);
+            this.button_edit_run.Location = new System.Drawing.Point(10, 235);
             this.button_edit_run.Name = "button_edit_run";
             this.button_edit_run.Size = new System.Drawing.Size(75, 23);
             this.button_edit_run.TabIndex = 18;
@@ -438,7 +497,6 @@
             this.textBox_end_rearrange_col.Name = "textBox_end_rearrange_col";
             this.textBox_end_rearrange_col.Size = new System.Drawing.Size(83, 21);
             this.textBox_end_rearrange_col.TabIndex = 1;
-            this.textBox_end_rearrange_col.Text = "H";
             this.textBox_end_rearrange_col.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // textBox_start_rearrange_clo
@@ -499,16 +557,26 @@
             this.button_select_edit_file.UseVisualStyleBackColor = true;
             this.button_select_edit_file.Click += new System.EventHandler(this.button_select_file_Click);
             // 
+            // progressBar1
+            // 
+            this.progressBar1.BackColor = System.Drawing.Color.Silver;
+            this.progressBar1.ForeColor = System.Drawing.Color.Lime;
+            this.progressBar1.Location = new System.Drawing.Point(10, 264);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(198, 23);
+            this.progressBar1.TabIndex = 21;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(232, 253);
+            this.ClientSize = new System.Drawing.Size(232, 321);
             this.Controls.Add(this.tabControl1);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage_New.ResumeLayout(false);
@@ -522,6 +590,8 @@
             this.tabPage_Add.ResumeLayout(false);
             this.tabPage_Add.PerformLayout();
             this.tabPage_Edit.ResumeLayout(false);
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.groupBox5.ResumeLayout(false);
@@ -552,7 +622,7 @@
         private System.Windows.Forms.TextBox textBox_num_col;
         private System.Windows.Forms.TextBox textBox_target_cell;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button_save_add;
         private System.Windows.Forms.Button button_run;
         private System.Windows.Forms.TextBox textBox_row_count;
         private System.Windows.Forms.Label label2;
@@ -572,6 +642,11 @@
         private System.Windows.Forms.TextBox textBox_cells;
         private System.Windows.Forms.Button button_edit_save;
         private System.Windows.Forms.Button button_edit_run;
+        private System.Windows.Forms.GroupBox groupBox7;
+        private System.Windows.Forms.CheckBox checkBox_new_sheet;
+        private System.Windows.Forms.CheckBox checkBox_new_file;
+        private System.Windows.Forms.Button button_txt;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
 

@@ -54,3 +54,10 @@ D:\work\Data2Excel\Data2Excel\Data2Excel\obj\Debug\Data2Excel.csproj.CoreCompile
 D:\work\Data2Excel\Data2Excel\Data2Excel\obj\Debug\Data2Excel.csproj.CopyComplete
 D:\work\Data2Excel\Data2Excel\Data2Excel\obj\Debug\Data2Excel.exe
 D:\work\Data2Excel\Data2Excel\Data2Excel\obj\Debug\Data2Excel.pdb
+F:\UpWork\10-Data2Excel-c#\Data2Excel\bin\Debug\EPPlus.dll
+F:\UpWork\10-Data2Excel-c#\Data2Excel\bin\Debug\EPPlus.Interfaces.dll
+F:\UpWork\10-Data2Excel-c#\Data2Excel\bin\Debug\EPPlus.System.Drawing.dll
+F:\UpWork\10-Data2Excel-c#\Data2Excel\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
+F:\UpWork\10-Data2Excel-c#\Data2Excel\bin\Debug\System.ComponentModel.Annotations.dll
+F:\UpWork\10-Data2Excel-c#\Data2Excel\bin\Debug\EPPlus.xml
+F:\UpWork\10-Data2Excel-c#\Data2Excel\bin\Debug\Microsoft.IO.RecyclableMemoryStream.xml
